@@ -1,24 +1,59 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
+import logo from "@/assets/logo.png";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
 export const Route = createFileRoute("/")({
-  component: Index,
+  ssr: false,
+  head: () => ({
+    meta: [
+      { title: "My Study Companion — Build the Habit. Achieve the Dream." },
+      {
+        name: "description",
+        content:
+          "Track study sessions, hit daily goals and keep your streak alive with My Study Companion.",
+      },
+      { property: "og:title", content: "My Study Companion" },
+      { property: "og:description", content: "Build the habit. Achieve the dream." },
+    ],
+  }),
+  component: SplashPage,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function SplashPage() {
+  const navigate = useNavigate();
+  const [progress, setProgress] = useState(10);
+
+  useEffect(() => {
+    const interval = setInterval(() => setProgress((p) => Math.min(95, p + 12)), 120);
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      if (cancelled) return;
+      setProgress(100);
+      setTimeout(() => {
+        navigate({ to: data.session ? "/dashboard" : "/auth", replace: true });
+      }, 350);
+    })();
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [navigate]);
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="flex min-h-screen items-center justify-center bg-background px-6">
+      <div className="w-full max-w-md text-center">
+        <img src={logo} alt="My Study Companion logo" width={816} height={816} className="mx-auto h-32 w-32" />
+        <h1 className="mt-6 text-2xl font-bold text-foreground">My Study Companion</h1>
+        <p className="mt-2 text-sm text-muted-foreground">Build the Habit. Achieve the Dream.</p>
+        <div className="mx-auto mt-8 h-1.5 w-48 overflow-hidden rounded-full bg-muted">
+          <div
+            className="h-full rounded-full bg-primary transition-all duration-200"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
     </div>
   );
 }
