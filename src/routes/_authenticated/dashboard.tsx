@@ -10,15 +10,8 @@ import { RecentSessionsCard } from "@/components/dashboard/RecentSessionsCard";
 import { TodayOverviewCard } from "@/components/dashboard/TodayOverviewCard";
 import { Button } from "@/components/ui/button";
 import { useGoals, useNotifications, useProfile, useSessions, useStreak } from "@/hooks/useStudyData";
-import {
-  buildProgress,
-  completedIn,
-  dayRange,
-  monthRange,
-  totalMinutes,
-  weekRange,
-  weeklyHeatmap,
-} from "@/utilities/goalCalculators";
+import { studyOverview } from "@/services/statsService";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
