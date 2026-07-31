@@ -147,12 +147,24 @@ export async function setSessionStatus(
   if (error) throw error;
 }
 
-export async function cancelSession(sessionId: string): Promise<void> {
+export async function cancelSession(
+  sessionId: string,
+  elapsedSeconds = 0,
+  pausedSeconds = 0,
+): Promise<void> {
+  // Persist the exact elapsed seconds so a restore within 24h keeps the real duration.
   const { error } = await supabase
     .from("study_sessions")
-    .update({ status: "CANCELLED", cancelled_at: new Date().toISOString() })
+    .update({
+      status: "CANCELLED",
+      cancelled_at: new Date().toISOString(),
+      end_time: new Date().toISOString(),
+      duration_seconds: Math.max(0, Math.floor(elapsedSeconds)),
+      paused_duration_seconds: Math.max(0, Math.floor(pausedSeconds)),
+    })
     .eq("id", sessionId);
   if (error) throw error;
+  await recalculateMetrics();
 }
 
 export interface CompletionResult {

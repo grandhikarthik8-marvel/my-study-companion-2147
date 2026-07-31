@@ -21,7 +21,7 @@ export function CancelledSessionsAccordion({ sessions }: { sessions: StudySessio
     setBusyId(id);
     try {
       await restoreSession(id);
-      await queryClient.invalidateQueries();
+      await queryClient.invalidateQueries({ refetchType: "all" });
       toast.success("Session restored", { description: "Goals, streaks and reports were updated." });
     } catch (error) {
       toast.error("Could not restore session", {
