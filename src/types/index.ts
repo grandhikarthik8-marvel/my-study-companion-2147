@@ -64,19 +64,20 @@ export interface AppNotification {
 }
 
 export interface GoalProgress {
-  minutes: number;
-  goalMinutes: number;
+  seconds: number;
+  goalSeconds: number;
   percent: number;
 }
 
 export interface SubjectTotal {
   subject: string;
-  minutes: number;
+  seconds: number;
 }
 
 export interface HeatmapDay {
   date: string;
   label: string;
-  minutes: number;
+  seconds: number;
   intensity: 0 | 1 | 2 | 3 | 4;
 }
+
