@@ -40,14 +40,9 @@ function DashboardPage() {
 
   const loading = profile.isLoading || goals.isLoading || sessions.isLoading;
   const all = sessions.data ?? [];
-  const day = dayRange();
-  const week = weekRange();
-  const month = monthRange();
-
-  const todayMinutes = totalMinutes(completedIn(all, day.from, day.to));
-  const weekMinutes = totalMinutes(completedIn(all, week.from, week.to));
-  const monthMinutes = totalMinutes(completedIn(all, month.from, month.to));
+  const overview = studyOverview(all, goals.data ?? null);
   const unread = (notifications.data ?? []).filter((n) => !n.is_read).length;
+
 
   return (
     <AppShell
