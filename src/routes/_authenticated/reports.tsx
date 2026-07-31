@@ -7,15 +7,9 @@ import { SubjectSummaryCards } from "@/components/reports/SubjectSummaryCards";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSessions } from "@/hooks/useStudyData";
-import {
-  completedIn,
-  dayRange,
-  monthRange,
-  subjectTotals,
-  totalMinutes,
-  weekRange,
-} from "@/utilities/goalCalculators";
-import { formatMinutes } from "@/utilities/timeFormatters";
+import { periodStats, type StatsPeriod } from "@/services/statsService";
+import { formatStopwatch } from "@/utilities/timeFormatters";
+
 
 export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({
@@ -29,15 +23,14 @@ export const Route = createFileRoute("/_authenticated/reports")({
   component: ReportsPage,
 });
 
-type Period = "daily" | "weekly" | "monthly";
+type Period = StatsPeriod;
 
 function ReportsPage() {
   const [period, setPeriod] = useState<Period>("weekly");
   const sessions = useSessions();
 
-  const range = period === "daily" ? dayRange() : period === "weekly" ? weekRange() : monthRange();
-  const scoped = completedIn(sessions.data ?? [], range.from, range.to);
-  const totals = subjectTotals(scoped);
+  // Shared calculation service — identical logic to the Dashboard.
+  const stats = periodStats(sessions.data ?? [], period);
 
   return (
     <AppShell
@@ -62,13 +55,13 @@ function ReportsPage() {
         <>
           <Card className="p-5">
             <p className="text-xs uppercase tracking-wide text-muted-foreground">Total study time</p>
-            <p className="mt-1 text-3xl font-bold text-foreground">{formatMinutes(totalMinutes(scoped))}</p>
+            <p className="mt-1 font-mono text-3xl font-bold tabular-nums text-foreground">{formatStopwatch(stats.seconds)}</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              {scoped.length} completed session{scoped.length === 1 ? "" : "s"}
+              {stats.sessionCount} completed session{stats.sessionCount === 1 ? "" : "s"}
             </p>
           </Card>
-          <AnalyticsBarChart data={totals} />
-          <SubjectSummaryCards totals={totals} />
+          <AnalyticsBarChart data={stats.subjects} />
+          <SubjectSummaryCards totals={stats.subjects} />
         </>
       )}
     </AppShell>

@@ -1,11 +1,12 @@
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { Card } from "@/components/ui/card";
+import { formatStopwatch } from "@/utilities/timeFormatters";
 import type { SubjectTotal } from "@/types";
 
 export function AnalyticsBarChart({ data }: { data: SubjectTotal[] }) {
   return (
     <Card className="p-5">
-      <h2 className="mb-3 text-sm font-semibold text-foreground">Minutes by subject</h2>
+      <h2 className="mb-3 text-sm font-semibold text-foreground">Study time by subject</h2>
       {data.length === 0 ? (
         <p className="text-xs text-muted-foreground">No study data for this period yet.</p>
       ) : (
@@ -23,8 +24,11 @@ export function AnalyticsBarChart({ data }: { data: SubjectTotal[] }) {
                 tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
                 tickLine={false}
                 axisLine={false}
+                width={64}
+                tickFormatter={(v: number) => formatStopwatch(v)}
               />
               <Tooltip
+                formatter={(v: number) => [formatStopwatch(v), "Studied"]}
                 cursor={{ fill: "var(--muted)" }}
                 contentStyle={{
                   background: "var(--popover)",
@@ -33,7 +37,7 @@ export function AnalyticsBarChart({ data }: { data: SubjectTotal[] }) {
                   color: "var(--popover-foreground)",
                 }}
               />
-              <Bar dataKey="minutes" fill="var(--primary)" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="seconds" fill="var(--primary)" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

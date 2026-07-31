@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import { BookOpen } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import type { StudySession } from "@/types";
-import { formatDuration } from "@/utilities/timeFormatters";
+import { formatStopwatch } from "@/utilities/timeFormatters";
 
 export function RecentSessionsCard({ sessions }: { sessions: StudySession[] }) {
   return (
@@ -24,7 +24,7 @@ export function RecentSessionsCard({ sessions }: { sessions: StudySession[] }) {
                 </p>
               </div>
               <span className="shrink-0 text-sm font-semibold text-primary">
-                {formatDuration(s.duration_seconds)}
+                {formatStopwatch(s.duration_seconds)}
               </span>
             </li>
           ))}

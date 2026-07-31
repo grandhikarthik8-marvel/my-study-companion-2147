@@ -121,7 +121,7 @@ function SessionPage() {
         totalPausedSeconds(state),
       );
       timer.reset();
-      await queryClient.invalidateQueries();
+      await queryClient.invalidateQueries({ refetchType: "all" });
       toast.success("Session saved!", {
         description: `You studied ${formatStopwatch(result.durationSeconds)}.`,
       });
@@ -141,9 +141,14 @@ function SessionPage() {
     if (!timer.sessionId) return;
     setBusy(true);
     try {
-      await cancelSession(timer.sessionId);
+      const state = useTimerStore.getState();
+      await cancelSession(
+        state.sessionId!,
+        computeElapsedSeconds(state),
+        totalPausedSeconds(state),
+      );
       timer.reset();
-      await queryClient.invalidateQueries();
+      await queryClient.invalidateQueries({ refetchType: "all" });
       toast("Session cancelled", { description: "You can restore it from Profile within 24 hours." });
     } catch (error) {
       toast.error("Could not cancel the session", {

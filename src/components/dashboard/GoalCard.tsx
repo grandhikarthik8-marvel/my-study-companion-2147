@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import type { GoalProgress } from "@/types";
-import { formatMinutes } from "@/utilities/timeFormatters";
+import { formatStopwatch } from "@/utilities/timeFormatters";
 
 function Row({ label, progress }: { label: string; progress: GoalProgress }) {
   return (
@@ -14,11 +14,12 @@ function Row({ label, progress }: { label: string; progress: GoalProgress }) {
       </div>
       <Progress value={Math.min(100, progress.percent)} className="h-2" />
       <p className="text-xs text-muted-foreground">
-        {formatMinutes(progress.minutes)} of {formatMinutes(progress.goalMinutes)}
+        {formatStopwatch(progress.seconds)} of {formatStopwatch(progress.goalSeconds)}
       </p>
     </div>
   );
 }
+
 
 export function GoalCard({
   daily,

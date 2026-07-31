@@ -10,15 +10,8 @@ import { RecentSessionsCard } from "@/components/dashboard/RecentSessionsCard";
 import { TodayOverviewCard } from "@/components/dashboard/TodayOverviewCard";
 import { Button } from "@/components/ui/button";
 import { useGoals, useNotifications, useProfile, useSessions, useStreak } from "@/hooks/useStudyData";
-import {
-  buildProgress,
-  completedIn,
-  dayRange,
-  monthRange,
-  totalMinutes,
-  weekRange,
-  weeklyHeatmap,
-} from "@/utilities/goalCalculators";
+import { studyOverview } from "@/services/statsService";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -47,14 +40,9 @@ function DashboardPage() {
 
   const loading = profile.isLoading || goals.isLoading || sessions.isLoading;
   const all = sessions.data ?? [];
-  const day = dayRange();
-  const week = weekRange();
-  const month = monthRange();
-
-  const todayMinutes = totalMinutes(completedIn(all, day.from, day.to));
-  const weekMinutes = totalMinutes(completedIn(all, week.from, week.to));
-  const monthMinutes = totalMinutes(completedIn(all, month.from, month.to));
+  const overview = studyOverview(all, goals.data ?? null);
   const unread = (notifications.data ?? []).filter((n) => !n.is_read).length;
+
 
   return (
     <AppShell
@@ -91,14 +79,14 @@ function DashboardPage() {
       ) : (
         <>
           <CompanionPlaceholderCard />
-          <TodayOverviewCard todayMinutes={todayMinutes} streak={streak.data?.current_streak ?? 0} />
-          <GoalCard
-            daily={buildProgress(todayMinutes, goals.data?.daily_goal_minutes ?? 120)}
-            weekly={buildProgress(weekMinutes, goals.data?.weekly_goal_minutes ?? 840)}
-            monthly={buildProgress(monthMinutes, goals.data?.monthly_goal_minutes ?? 3600)}
+          <TodayOverviewCard
+            todaySeconds={overview.today.seconds}
+            streak={streak.data?.current_streak ?? 0}
           />
-          <HeatmapCard days={weeklyHeatmap(all)} />
-          <RecentSessionsCard sessions={all.filter((s) => s.status === "COMPLETED").slice(0, 3)} />
+          <GoalCard daily={overview.daily} weekly={overview.weekly} monthly={overview.monthly} />
+          <HeatmapCard days={overview.heatmap} />
+          <RecentSessionsCard sessions={overview.recent} />
+
         </>
       )}
 
