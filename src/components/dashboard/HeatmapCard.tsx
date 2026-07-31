@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import type { HeatmapDay } from "@/types";
-import { formatMinutes } from "@/utilities/timeFormatters";
+import { formatStopwatch } from "@/utilities/timeFormatters";
 
 const intensityClass: Record<HeatmapDay["intensity"], string> = {
   0: "bg-muted",
@@ -19,8 +19,8 @@ export function HeatmapCard({ days }: { days: HeatmapDay[] }) {
           <div key={d.date} className="flex flex-col items-center gap-1">
             <div
               className={`h-10 w-full rounded-lg ${intensityClass[d.intensity]}`}
-              title={`${d.date}: ${formatMinutes(d.minutes)}`}
-              aria-label={`${d.date}: ${formatMinutes(d.minutes)} studied`}
+              title={`${d.date}: ${formatStopwatch(d.seconds)}`}
+              aria-label={`${d.date}: ${formatStopwatch(d.seconds)} studied`}
             />
             <span className="text-[10px] text-muted-foreground">{d.label}</span>
           </div>
