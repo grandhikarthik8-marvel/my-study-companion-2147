@@ -8,7 +8,7 @@ import type {
   StudyStreak,
 } from "@/types";
 import { nextStreak } from "@/utilities/streakUtils";
-import { completedIn, dayRange, totalMinutes } from "@/utilities/goalCalculators";
+import { completedIn, dayRange, totalSeconds } from "@/utilities/goalCalculators";
 
 async function requireUserId(): Promise<string> {
   const { data, error } = await supabase.auth.getUser();
@@ -142,7 +142,7 @@ export async function setSessionStatus(
 ): Promise<void> {
   const { error } = await supabase
     .from("study_sessions")
-    .update({ status, paused_duration_seconds: Math.round(pausedSeconds) })
+    .update({ status, paused_duration_seconds: Math.max(0, Math.floor(pausedSeconds)) })
     .eq("id", sessionId);
   if (error) throw error;
 }
@@ -170,14 +170,14 @@ export async function completeSession(
     .update({
       status: "COMPLETED",
       end_time: new Date().toISOString(),
-      duration_seconds: Math.max(0, Math.round(elapsedSeconds)),
-      paused_duration_seconds: Math.round(pausedSeconds),
+      duration_seconds: Math.max(0, Math.floor(elapsedSeconds)),
+      paused_duration_seconds: Math.max(0, Math.floor(pausedSeconds)),
     })
     .eq("id", sessionId);
   if (error) throw error;
 
   const newBadges = await recalculateMetrics();
-  return { durationSeconds: Math.round(elapsedSeconds), newBadges };
+  return { durationSeconds: Math.max(0, Math.floor(elapsedSeconds)), newBadges };
 }
 
 export async function restoreSession(sessionId: string): Promise<void> {
@@ -222,11 +222,12 @@ export async function recalculateMetrics(): Promise<{ key: string; name: string 
 
   const completed = sessions.filter((s) => s.status === "COMPLETED");
   const { from, to } = dayRange();
-  const todayMinutes = totalMinutes(completedIn(sessions, from, to));
+  const todaySeconds = totalSeconds(completedIn(sessions, from, to));
+  const todayMinutes = todaySeconds / 60;
 
   // Streak update
   let currentStreak = streak?.current_streak ?? 0;
-  if (todayMinutes >= 1) {
+  if (todaySeconds >= 60) {
     const next = nextStreak({
       current_streak: streak?.current_streak ?? 0,
       longest_streak: streak?.longest_streak ?? 0,
