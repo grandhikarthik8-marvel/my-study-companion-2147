@@ -7,15 +7,9 @@ import { SubjectSummaryCards } from "@/components/reports/SubjectSummaryCards";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSessions } from "@/hooks/useStudyData";
-import {
-  completedIn,
-  dayRange,
-  monthRange,
-  subjectTotals,
-  totalMinutes,
-  weekRange,
-} from "@/utilities/goalCalculators";
-import { formatMinutes } from "@/utilities/timeFormatters";
+import { periodStats, type StatsPeriod } from "@/services/statsService";
+import { formatStopwatch } from "@/utilities/timeFormatters";
+
 
 export const Route = createFileRoute("/_authenticated/reports")({
   head: () => ({
