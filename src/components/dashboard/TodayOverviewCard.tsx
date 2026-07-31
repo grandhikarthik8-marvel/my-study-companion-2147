@@ -1,19 +1,21 @@
 import { Flame } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { formatMinutes } from "@/utilities/timeFormatters";
+import { formatStopwatch } from "@/utilities/timeFormatters";
 
 export function TodayOverviewCard({
-  todayMinutes,
+  todaySeconds,
   streak,
 }: {
-  todayMinutes: number;
+  todaySeconds: number;
   streak: number;
 }) {
   return (
     <Card className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 p-5">
       <div className="min-w-0">
         <p className="text-xs uppercase tracking-wide text-muted-foreground">Studied today</p>
-        <p className="mt-1 truncate text-3xl font-bold text-foreground">{formatMinutes(todayMinutes)}</p>
+        <p className="mt-1 truncate font-mono text-3xl font-bold tabular-nums text-foreground">
+          {formatStopwatch(todaySeconds)}
+        </p>
       </div>
       <div className="flex shrink-0 items-center gap-1.5 rounded-full bg-warning/15 px-3 py-2 text-warning">
         <Flame className="h-4 w-4" aria-hidden />
