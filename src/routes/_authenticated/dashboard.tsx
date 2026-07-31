@@ -79,14 +79,14 @@ function DashboardPage() {
       ) : (
         <>
           <CompanionPlaceholderCard />
-          <TodayOverviewCard todayMinutes={todayMinutes} streak={streak.data?.current_streak ?? 0} />
-          <GoalCard
-            daily={buildProgress(todayMinutes, goals.data?.daily_goal_minutes ?? 120)}
-            weekly={buildProgress(weekMinutes, goals.data?.weekly_goal_minutes ?? 840)}
-            monthly={buildProgress(monthMinutes, goals.data?.monthly_goal_minutes ?? 3600)}
+          <TodayOverviewCard
+            todaySeconds={overview.today.seconds}
+            streak={streak.data?.current_streak ?? 0}
           />
-          <HeatmapCard days={weeklyHeatmap(all)} />
-          <RecentSessionsCard sessions={all.filter((s) => s.status === "COMPLETED").slice(0, 3)} />
+          <GoalCard daily={overview.daily} weekly={overview.weekly} monthly={overview.monthly} />
+          <HeatmapCard days={overview.heatmap} />
+          <RecentSessionsCard sessions={overview.recent} />
+
         </>
       )}
 
